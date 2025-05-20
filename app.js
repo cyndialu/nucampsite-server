@@ -27,6 +27,16 @@ connect.then(() => console.log('Connected correctly to server'),
 
 var app = express();
 
+// Secure traffic only
+app.all('*', (req, res, next) => {
+  if (req.secure) {
+    return next();
+  } else {
+    console.log(`Redirecting to: https://${req.hostname}:${app.get('secPort')}${req.url}`);
+    res.redirect(301, `https://${req.hostname}:${app.get('secPort')}${req.url}`);
+  }
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -71,20 +81,20 @@ app.use('/users', usersRouter);
       return next(err);
     } */
 
-  /* if (!req.session.user) {
+/* if (!req.session.user) {
+  const err = new Error('You are not authenticated!');
+  err.status = 401;
+  return next(err);
+} else {
+  //if (req.signedCookies.user === 'admin') {
+  if (req.session.user === 'authenticated') {
+    return next();
+  } else {
     const err = new Error('You are not authenticated!');
     err.status = 401;
     return next(err);
-  } else {
-    //if (req.signedCookies.user === 'admin') {
-    if (req.session.user === 'authenticated') {
-      return next();
-    } else {
-      const err = new Error('You are not authenticated!');
-      err.status = 401;
-      return next(err);
-    }
-  } */
+  }
+} */
 
 
 //app.use(auth);
